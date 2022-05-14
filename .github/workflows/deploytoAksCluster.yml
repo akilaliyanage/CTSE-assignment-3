@@ -9,26 +9,38 @@ jobs:
     - uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-    - name: Create ACR
-      id: create-acr
+        
+    - uses: actions/checkout@v3
+    - name: Docker login
+      env:
+        DOCKER_USER: ${{secrets.DOCKER_USER}}
+        DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
       run: |
-        az acr create -n akila -g akila81dc-rg --location "Japan East" --sku Basic --admin-enabled
-        echo "::set-output name=acr_username::`az acr credential show -n akila --query username | xargs`"
-        echo "::set-output name=acr_password::`az acr credential show -n akila --query passwords[0].value | xargs`"
-        echo "::add-mask::`az acr credential show -n akila --query passwords[0].value | xargs`"
+        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag mahenpt/it19120362-ctse:${GITHUB_SHA}
+    - name: push the image
+      run: docker push akilaliyanage/it19120362-ctse:${GITHUB_SHA}
 
-    - uses: azure/docker-login@v1
-      with:
-        login-server: akila.azurecr.io
-        username: ${{ steps.create-acr.outputs.acr_username }}
-        password: ${{ steps.create-acr.outputs.acr_password }}
+#     - name: Create ACR
+#       id: create-acr
+#       run: |
+#         az acr create -n akila -g akila81dc-rg --location "Japan East" --sku Basic --admin-enabled
+#         echo "::set-output name=acr_username::`az acr credential show -n akila --query username | xargs`"
+#         echo "::set-output name=acr_password::`az acr credential show -n akila --query passwords[0].value | xargs`"
+#         echo "::add-mask::`az acr credential show -n akila --query passwords[0].value | xargs`"
 
-    - name: Build and push image to ACR
-      id: build-image
-      run: |
-        docker build "$GITHUB_WORKSPACE/" -f  "Dockerfile" -t akila.azurecr.io/myakscluster:${{ github.sha }} --label dockerfile-path=Dockerfile
-        docker push akila.azurecr.io/myakscluster:${{ github.sha }}
+#     - uses: azure/docker-login@v1
+#       with:
+#         login-server: akila.azurecr.io
+#         username: ${{ steps.create-acr.outputs.acr_username }}
+#         password: ${{ steps.create-acr.outputs.acr_password }}
+
+#     - name: Build and push image to ACR
+#       id: build-image
+#       run: |
+#         docker build "$GITHUB_WORKSPACE/" -f  "Dockerfile" -t akila.azurecr.io/myakscluster:${{ github.sha }} --label dockerfile-path=Dockerfile
+#         docker push akila.azurecr.io/myakscluster:${{ github.sha }}
     
     - uses: azure/k8s-set-context@v1
       id: login
@@ -43,13 +55,13 @@ jobs:
             echo `kubectl create namespace myaksclusteraa58`
         fi
 
-    - uses: azure/k8s-create-secret@v1
-      with:
-        namespace: myaksclusteraa58
-        container-registry-url: akila.azurecr.io
-        container-registry-username: ${{ steps.create-acr.outputs.acr_username }}
-        container-registry-password: ${{ steps.create-acr.outputs.acr_password }}
-        secret-name: myaksclusterdockerauth
+#     - uses: azure/k8s-create-secret@v1
+#       with:
+#         namespace: myaksclusteraa58
+#         container-registry-url: akila.azurecr.io
+#         container-registry-username: ${{ steps.create-acr.outputs.acr_username }}
+#         container-registry-password: ${{ steps.create-acr.outputs.acr_password }}
+#         secret-name: myaksclusterdockerauth
        
     - uses: azure/k8s-deploy@v1.2
       with:
@@ -58,6 +70,6 @@ jobs:
           manifests/deployment.yml
           manifests/service.yml
         images: |
-          akila.azurecr.io/myakscluster:${{ github.sha }}
+          akilaliyanage/it19120362-ctse:${GITHUB_SHA}
         imagepullsecrets: |
           myaksclusterdockerauth   

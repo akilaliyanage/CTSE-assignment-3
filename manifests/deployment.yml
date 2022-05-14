@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: "myakscluster-3c1e"
-          image: "akila.azurecr.io/myakscluster"
+          image: "akilaliyanage/it19120362_ctse"
           ports:
           - containerPort: 3000

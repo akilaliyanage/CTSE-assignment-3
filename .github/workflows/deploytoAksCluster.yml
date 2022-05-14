@@ -10,17 +10,17 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
         
-    - uses: actions/checkout@v3
-    - name: Docker login
-      env:
-        DOCKER_USER: ${{secrets.DOCKER_USER}}
-        DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
-      run: |
-        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag akilaliyanage/it19120362_ctse:${GITHUB_SHA}
-    - name: push the image
-      run: docker push akilaliyanage/it19120812_ctse:${GITHUB_SHA}
+#     - uses: actions/checkout@v3
+#     - name: Docker login
+#       env:
+#         DOCKER_USER: ${{secrets.DOCKER_USER}}
+#         DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+#       run: |
+#         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+#     - name: Build the Docker image
+#       run: docker build . --file Dockerfile --tag akilaliyanage/it19120362_ctse:${GITHUB_SHA}
+#     - name: push the image
+#       run: docker push akilaliyanage/it19120812_ctse:${GITHUB_SHA}
 
 #     - name: Create ACR
 #       id: create-acr

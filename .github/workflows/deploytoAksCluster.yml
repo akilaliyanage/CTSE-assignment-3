@@ -18,9 +18,9 @@ jobs:
       run: |
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag mahenpt/it19120362-ctse:${GITHUB_SHA}
+      run: docker build . --file Dockerfile --tag akilaliyanage/it19120362_ctse:${GITHUB_SHA}
     - name: push the image
-      run: docker push akilaliyanage/it19120362-ctse:${GITHUB_SHA}
+      run: docker push akilaliyanage/it19120812_ctse:${GITHUB_SHA}
 
 #     - name: Create ACR
 #       id: create-acr

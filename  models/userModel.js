@@ -32,7 +32,9 @@ const userSchema = new Schema({
         type: String,
         required: false
     },
-    cart: {type: mongoose.Schema.Types.ObjectId, ref: 'Cart'}
+    coupons:[
+        {type : Schema.Types.ObjectId, ref : 'Coupon'}
+    ]
 })
 const User = mongoose.model("User", userSchema);
 module.exports = User;

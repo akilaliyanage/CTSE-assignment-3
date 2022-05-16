@@ -1,5 +1,9 @@
 var express = require('express');
 const axios = require('axios');
+require('dotenv/config')
+const User = require("../ models/userModel");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 var router = express.Router();
 
 /* GET users listing. */
@@ -19,16 +23,7 @@ router.post("/register", async (req, res) => {
 
     //cart creation -----------------------------------------------------------------
     //creating a new cart for the user
-    var cartId;
-
-    axios.get('')
-
-    cartItem.save().then(data =>{
-      cartId = data._id;
-      console.log(cartId);
-    }).catch(err =>{
-      console.log(err);
-    })
+    var cartId = null;
 
     let full_name = req.body.full_name;
     let email = req.body.email;
@@ -49,19 +44,19 @@ router.post("/register", async (req, res) => {
     });
 
     user.save().then(data => {
-
-      updateCart(data, cartId)
+      console.log(data.id)
+      axios.get(process.env.nethsara + "/create/" + data.id)
+          .then(res => {
+            console.log("cart created")
+          }).catch(err => {
+        res.status(500).json({message : 'error'})
+      })
 
       res.json({ status: 201, message: "user registered" });
     });
   }
 });
 
-async function  updateCart (data, cartId){
-  console.log(data, cartId);
-  //adding the user to cart
-  await Cart.findByIdAndUpdate({_id : cartId} , {user_id : data._id});
-}
 
 
 //User Login
@@ -70,7 +65,11 @@ router.post("/login", async (req, res) => {
     let email = req.body.email;
     let password = req.body.password;
 
-    const user = await User.findOne({ email: email }).populate('cart');
+    console.log(email,password)
+
+    const user = await User.findOne({ email: email })
+
+    console.log(user)
 
     if (user) {
       const auth = await bcrypt.compare(password, user.password);
@@ -103,7 +102,7 @@ router.get("/:id", async (req, res) => {
     const user = await User.findOne({ _id:userID });
 
     if (user) {
-      const orders = await Order.find({"user": userID}).populate('items');
+      //const orders = await Order.find({"user": userID}).populate('items');
       res.json({ status: 200, user: user, orders: orders});
     } else {
       res.json({ status: 404, message: "user does not exist." });

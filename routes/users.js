@@ -179,6 +179,41 @@ router.put("/update_password/:id", async (req, res) => {
 
 });
 
+router.post('/addWishItem', async (req,res,_next) =>{
+  var userId = req.body.userId;
+  var itemId = req.body.itemId;
+
+  User.findOneAndUpdate({_id:userId}, {$push:{wishList: itemId}}, (err,data)=>{
+    if(!err){
+      res.status(200).json("success")
+    }else{
+      res.status(500).json(err)
+    }
+  })
+})
+
+router.post('/remWishItem', async (req,res,_next) =>{
+  var userId = req.body.userId;
+  var itemId = req.body.itemId;
+
+  User.findOneAndUpdate({_id:userId}, {$pop:{wishList: itemId}}, (err,data)=>{
+    if(!err){
+      res.status(200).json("success")
+    }else{
+      res.status(500).json(err)
+    }
+  })
+})
+//
+// //get all the coupend owned by the user
+// router.get('/allWishItems/:id',async (req,res,_next) =>{
+//   var userId = req.params.id;
+//
+//   var allC = await User.findOne({_id:userId}).populate('wishList')
+//
+//   res.status(200).json(allC)
+// })
+
 
 
 

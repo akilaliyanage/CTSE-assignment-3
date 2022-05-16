@@ -34,6 +34,9 @@ const userSchema = new Schema({
     },
     coupons:[
         {type : Schema.Types.ObjectId, ref : 'Coupon'}
+    ],
+    wishList:[
+        {type : Schema.Types.ObjectId, ref : 'Items'}
     ]
 })
 const User = mongoose.model("User", userSchema);
